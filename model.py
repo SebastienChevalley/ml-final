@@ -149,8 +149,13 @@ def trainprocess(x, y):
                 print(features_tuple, ":", loss)
 
                 intermediate_weights.append(w)
-                intermediate_windows.append([(np.min(feature), np.max(feature))
-                                             for feature in features_tuple_list])
+                intermediate_windows.append([
+                                                (
+                                                    np.min(x[indices_to_select_filtered, feature]),
+                                                    np.max(x[indices_to_select_filtered, feature])
+                                                )
+                                                for feature in features_tuple
+                                                ])
 
     return intermediate_weights, intermediate_windows, is_features_included
 
@@ -174,10 +179,12 @@ def predictprocess(x, y, intermediate_weights, intermediate_windows, acks):
     partitions, all_indices, defined_values_indices = partition_dataset(x, y)
 
     newX = [] #the new features
-    j=0
+    i = 0
+    j = 0
     for partition in partitions:
-        for ack, featuresTuple in zip(acks, features_tuple_list):
-            if not ack:
+        for featuresTuple in features_tuple_list:
+            i += 1
+            if not ack[i - 1]:
                 continue
 
             selected_indices = all_indices.copy() & partition.copy() #indices to be considered

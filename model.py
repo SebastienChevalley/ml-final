@@ -184,7 +184,7 @@ def predictprocess(x, y, intermediate_weights, intermediate_windows, acks):
     for partition in partitions:
         for featuresTuple in features_tuple_list:
             i += 1
-            if not ack[i - 1]:
+            if not acks[i - 1]:
                 continue
 
             selected_indices = all_indices.copy() & partition.copy() #indices to be considered

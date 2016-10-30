@@ -15,7 +15,7 @@ def standardize(x, mean_x=None, std_x=None):
     return tx, mean_x, std_x
 
 
-def batch_iter(y, tx, batch_size, num_batches=None, shuffle=True):
+def batch_iter(y, tx, batch_size, num_batches=None, shuffle=True, seed= None):
     """
     Generate a minibatch iterator for a dataset.
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
@@ -33,6 +33,9 @@ def batch_iter(y, tx, batch_size, num_batches=None, shuffle=True):
         num_batches = min(num_batches, num_batches_max)
 
     if shuffle:
+        if seed is not None:
+            np.random.seed(seed)
+
         shuffle_indices = np.random.permutation(np.arange(data_size))
         shuffled_y = y[shuffle_indices]
         shuffled_tx = tx[shuffle_indices]

@@ -12,7 +12,6 @@ Implements all the helper functions
 import numpy as np
 from helpers import *
 
-
 def calculate_mse(e):
     """Calculate the mse for vector e."""
     return 1/2*np.mean(e**2)
@@ -125,10 +124,7 @@ def learning_by_penalized_gradient(y, tx, w, gamma, lambda_):
     # update w
     w = w - gamma * gradient
     return loss, w 
-    
 
-import numpy as np
-from helpers import *
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """calculates the least squares solution using gradient descent."""
@@ -154,7 +150,7 @@ def ridge_regression(y, tx, lambda_):
     loss = sum((y-np.dot(tx,w))**2)/(2*len(y))
     return w, loss
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= None):
     """Implements logistic regression using stochastic gradient descent"""
     batch_size = 1  ## Batch size of 1
     w = initial_w   ## Inital weight
@@ -162,7 +158,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     loss = 0
     for iter in range(max_iters):
         print(iter)
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size):
+        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_gradient_descent(minibatch_y, minibatch_tx, w, gamma)
@@ -178,7 +174,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_penalized_gradient(minibatch_y, minibatch_tx, w, gamma, lambda_)
-        return w, loss
+    return w, loss
 
 
 

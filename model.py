@@ -11,7 +11,6 @@ def partition_dataset(x, y):
 
     #all indices list
     all_indices = set([j for j in range(N)])
-    all_indices_list = list(all_indices)
 
     #signal indices and background indices lists
     signal_indices = ii(y == 1. )
@@ -24,7 +23,6 @@ def partition_dataset(x, y):
     #Jets number indices (0,1,2 or 3)
     jet_values = list(range(4))
     jet_number_indices = [ii(x[:, 22] == jet_number_value) for jet_number_value in jet_values]
-    jet_number_indices_list = [sorted(list(x)) for x in jet_number_indices]
 
     #Undefined values indices lists
     undefined_values_indices = [None]*Nd

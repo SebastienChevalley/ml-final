@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
 		## ========= Preprocess data =============================== ##
 		print("Preprocessing data...")
-		features_list = [[i] for i in range(13)]
+		features_list = [[i,j] for i in range(13) for j in range(i+1,13)]
 		tx_train_edited, tx_test_edited = prepare_data(raw_tx_train, y_train, features_list, raw_tx_test)
 		## ========================================================= ##
 		np.save("ids_test", ids_test)

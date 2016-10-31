@@ -5,20 +5,12 @@ from implementations import *
 from helpers import *
 from utils import *
 
-def partition_dataset(x, y):
+def partition_dataset(x):
     N = x.shape[0]
     Nd = x.shape[1]
 
     #all indices list
     all_indices = set([j for j in range(N)])
-
-    #signal indices and background indices lists
-    signal_indices = ii(y == 1. )
-    background_indices = ii(y == -1.)
-
-    signal_indices_list, background_indices_list = list(signal_indices), list(background_indices)
-    signal_indices_list.sort()
-    background_indices_list.sort()
 
     #Jets number indices (0,1,2 or 3)
     jet_values = list(range(4))
@@ -80,7 +72,7 @@ def trainprocess(x, y):
     # if a tuple of original features according a subset partition has no samples, it is excluded (<=> False)
     is_features_included = []
 
-    partitions, all_indices, defined_values_indices = partition_dataset(x, y)
+    partitions, all_indices, defined_values_indices = partition_dataset(x)
 
     for partition in partitions:
         for features_tuple in features_tuple_list:
@@ -93,7 +85,7 @@ def trainprocess(x, y):
             indices_to_select_list = list(indices_to_select)
 
             if len(indices_to_select_list) == 0:
-                print('u',features_tuple)
+                #print('u',features_tuple)
                 is_features_included.append(False)
                 continue
                 #Create the mesh grid for the tuple of features
@@ -144,7 +136,7 @@ def trainprocess(x, y):
             if include_feature:
                 intermediate_phi = buildpolyphi(x.copy(), features_tuple, indices_to_select_filtered, degree)
                 loss, w = least_squares(newX[-1][indices_to_select_filtered], intermediate_phi)
-                print(features_tuple, ":", loss)
+                #print(features_tuple, ":", loss)
 
                 intermediate_weights.append(w)
                 intermediate_windows.append([
@@ -152,13 +144,12 @@ def trainprocess(x, y):
                                                     np.min(x[indices_to_select_filtered, feature]),
                                                     np.max(x[indices_to_select_filtered, feature])
                                                 )
-                                                for feature in features_tuple
-                                                ])
+                                                for feature in features_tuple ])
 
     return intermediate_weights, intermediate_windows, is_features_included
 
 
-def predictprocess(x, y, intermediate_weights, intermediate_windows, acks):
+def predictprocess(x, intermediate_weights, intermediate_windows, acks):
     ## ============================================= ##
     ## ========= Preprocessing parameters ========== ##
     ## ============================================= ##
@@ -174,7 +165,7 @@ def predictprocess(x, y, intermediate_weights, intermediate_windows, acks):
     ## ============================================= ##
 
     N = x.shape[0]
-    partitions, all_indices, defined_values_indices = partition_dataset(x, y)
+    partitions, all_indices, defined_values_indices = partition_dataset(x)
 
     newX = [] #the new features
     i = 0

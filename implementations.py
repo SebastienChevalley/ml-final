@@ -156,8 +156,8 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= 1):
     w = initial_w   ## Inital weight
     # Iterate over each training sample
     loss = 0
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
-        for iter in range(max_iters):
+    for iter in range(max_iters):
+        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_gradient_descent(minibatch_y, minibatch_tx, w, gamma)
@@ -168,8 +168,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, seed= N
     batch_size = 1  ## Batch size of 1
     w = initial_w   ## Inital weight
     # Iterate over each training sample
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
-        for iter in range(max_iters): 
+    for iter in range(max_iters):
+        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_penalized_gradient(minibatch_y, minibatch_tx, w, gamma, lambda_)

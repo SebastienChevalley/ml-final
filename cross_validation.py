@@ -1,28 +1,29 @@
-"""
-cross_validation.py
-Performs K fold cross validation
-Inputs:
-    1. y: Labels
-    2. x: Features
-    3. K: K fold
-    4. model: 'least_squares','ridge_regression','logistic_regression','reg_logistic_regression'
-    5. max_iters: Maximum number of iterations
-    6. initial_w: Weight initialisation
-    7. num_epochs: Number of epochs (default set to 1)
-    8. shuffle: Shuffle input data for each epoch (default: True)
-    9. seed: Random seed (default: 1)
-Outputs:
-    1. w : Optimal weight
-    2. loss : Loss metric
-    3. avg_val_err: Average validation error
-    4. avg_train_err: Average training error
-"""
+
 from implementations import *
 from proj1_helpers import *
 import numpy as np
 
 ## Cross validation
 def cross_validation(y, x, K, model, lambda_, gamma, max_iters, initial_w, num_epochs=1, shuffle=True, seed=1):
+    """
+    cross_validation
+    Performs K fold cross validation
+    Inputs:
+        1. y: Labels
+        2. x: Features
+        3. K: K fold
+        4. model: 'logistic_regression', 'reg_logistic_regression', 'least_squares', 'least_squares_GD', 'least_squares_SGD', 'ridge_regression'
+        5. max_iters: Maximum number of iterations
+        6. initial_w: Weight initialisation
+        7. num_epochs: Number of epochs (default set to 1)
+        8. shuffle: Shuffle input data for each epoch (default: True)
+        9. seed: Random seed (default: 1)
+    Outputs:
+        1. w : Optimal weight
+        2. loss : Loss metric
+        3. avg_val_err: Average validation error
+        4. avg_train_err: Average training error
+    """
     data_size = len(y)   ## Number of data points
     x = np.array(x)
     y = np.array(y)

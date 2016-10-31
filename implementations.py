@@ -84,7 +84,7 @@ def sigmoid(t):
     ## Handling overflow/underflow
     plus = np.where(t>=0)
     minus = np.where(t<0)
-    sigmd = np.zeros(t.shape))
+    sigmd = np.zeros(t.shape)
     sigmd[minus] = np.exp(t[minus])/(1+np.exp(t[minus]))
     sigmd[plus] = 1/(1+np.exp(-t[plus]))
     return sigmd

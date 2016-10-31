@@ -92,14 +92,15 @@ def sigmoid(t):
 def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
     act = np.dot(tx,w)  ## Activation
-    #act = np.array(act)
     ## Handling overflow/underflow
     plus = np.where(act>100)
-    minus = np.where(act<=100)
-    logexp = act #np.empty(len(act)) #.reshape((len(act),1))
-    logexp[plus] = act[plus]
-    logexp[minus] = np.log(1+np.exp(act[minus]))
-    loss = sum(logexp) - np.dot(y,act)
+    minus = np.where(act<=-100)
+    logexp = act
+    logexp[plus] = 100
+    logexp[minus] = -100
+    logexp = np.log(1 + np.exp(act))
+
+    loss = np.sum(logexp) - np.dot(y,act)
     return loss
     
 def calculate_gradient(y, tx, w):

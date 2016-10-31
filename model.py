@@ -6,6 +6,14 @@ from helpers import *
 from utils import *
 
 def partition_dataset(x):
+    """
+    From the dataset, create partitions based on data of
+    the 23th column (integer) and the first column
+
+    :param x: the matrix of data
+    :return: partitions created, all indices of the dataset (convenience), the defined values indices per feature
+    """
+
     N = x.shape[0]
     Nd = x.shape[1]
 
@@ -40,6 +48,14 @@ def partition_dataset(x):
     return partitions, all_indices, defined_values_indices
 
 def trainprocess(x, y):
+    """
+    From a dataset and its label, it computes a set of new features based on a meshgrid accumulator
+
+    :param x: Train data
+    :param y: Label for train data
+    :return: intermediate_weights, intermediate_windows, is_features_included
+    """
+
     ## ============================================= ##
     ## ========= Preprocessing parameters ========== ##
     ## ============================================= ##
@@ -150,6 +166,17 @@ def trainprocess(x, y):
 
 
 def predictprocess(x, intermediate_weights, intermediate_windows, acks):
+    """
+    Returns a newly defined matrix with features computed from partitions
+    and intermediate weight and windows which des
+
+    :param x: Dataset
+    :param intermediate_weights: Intermediate weights per new feature candidate
+    :param intermediate_windows: List of feature candidate data range
+    :param acks:
+    :return:
+    """
+
     ## ============================================= ##
     ## ========= Preprocessing parameters ========== ##
     ## ============================================= ##

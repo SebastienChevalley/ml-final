@@ -188,7 +188,7 @@ def predictprocess(x, intermediate_weights, intermediate_windows, acks):
 
             selected_indices_list = list(selected_indices)
 
-            intermediate_phi = np.zeros((N, degree + 1))
+            intermediate_phi = np.zeros((N, len(featuresTuple)*degree + 1))
             intermediate_phi[selected_indices_list] = buildpolyphi(
                 x.copy(),
                 featuresTuple,

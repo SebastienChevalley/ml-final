@@ -38,7 +38,7 @@ def cross_validation(y, x, K, model, lambda_, gamma, max_iters, initial_w, num_e
 
     # Number of times K-fold cross validation is repeated
     for epoch in range(num_epochs):
-
+        print("epoch = {}".format(epoch))
         # Randomize to remove ordering in the input data
         if shuffle == True:
             shuffle_ind = np.random.permutation(np.arange(data_size))
@@ -50,6 +50,7 @@ def cross_validation(y, x, K, model, lambda_, gamma, max_iters, initial_w, num_e
 
         # K-fold cross validation
         for k in range(0,K):
+            print("k = {}".format(k))
 
             # Select validation data in kth fold
             start_val_ind = k*batch_size

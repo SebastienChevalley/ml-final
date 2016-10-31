@@ -11,7 +11,6 @@ Implements all the helper functions
 
 import numpy as np
 from helpers import *
-from IPython.core.debugger import Tracer
 
 def calculate_mse(e):
     """Calculate the mse for vector e."""
@@ -82,6 +81,7 @@ def learning_by_gradient_descent(y, tx, w, gamma):
 def sigmoid(t):
     """apply sigmoid function on t."""
     t = np.array(t)
+    ## Handling overflow/underflow
     plus = np.where(t>=0)
     minus = np.where(t<0)
     sigmd = t #np.empty(len(t)).reshape((len(t),1))
@@ -99,8 +99,8 @@ def calculate_loss(y, tx, w):
     logexp = act #np.empty(len(act)) #.reshape((len(act),1))
     logexp[plus] = act[plus]
     logexp[minus] = np.log(1+np.exp(act[minus]))
-    
-    return logexp
+    loss = sum(logexp) - np.dot(y,act)
+    return loss
     
 def calculate_gradient(y, tx, w):
     """compute the gradient of loss."""

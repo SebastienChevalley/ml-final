@@ -152,7 +152,7 @@ def ridge_regression(y, tx, lambda_):
     loss = sum((y-np.dot(tx,w))**2)/(2*len(y))
     return w, loss
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= None):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= 1):
     """Implements logistic regression using stochastic gradient descent"""
     batch_size = 1  ## Batch size of 1
     w = initial_w   ## Inital weight

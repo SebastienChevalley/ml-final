@@ -65,9 +65,9 @@ def cross_validation(y, x, K, model, lambda_, gamma, max_iters, initial_w, num_e
             # Logistic regression and reg_logistic_regression models
             if ((model=='logistic_regression') or (model=='reg_logistic_regression')):
                 if model=='logistic_regression':    ## Train the model
-                    w, loss = logistic_regression(y_train, x_train, initial_w, max_iters, gamma)
+                    w, loss = logistic_regression((1+y_train)/2, x_train, initial_w, max_iters, gamma)
                 elif model=='reg_logistic_regression':
-                    w, loss = reg_logistic_regression(y_train, x_train, lambda_, initial_w, max_iters, gamma)
+                    w, loss = reg_logistic_regression((1+y_train)/2, x_train, lambda_, initial_w, max_iters, gamma)
                 # Predict on validation and training data
                 y_pred_val = np.ones(len(y_val))
                 y_pred_val[sigmoid(np.dot(x_val,w)) <= 0.5] = -1

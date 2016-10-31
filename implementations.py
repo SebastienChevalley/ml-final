@@ -84,7 +84,7 @@ def sigmoid(t):
     ## Handling overflow/underflow
     plus = np.where(t>=0)
     minus = np.where(t<0)
-    sigmd = t #np.empty(len(t)).reshape((len(t),1))
+    sigmd = np.zeros(t.shape))
     sigmd[minus] = np.exp(t[minus])/(1+np.exp(t[minus]))
     sigmd[plus] = 1/(1+np.exp(-t[plus]))
     return sigmd
@@ -94,10 +94,8 @@ def calculate_loss(y, tx, w):
     act = np.dot(tx,w)  ## Activation
     ## Handling overflow/underflow
     plus = np.where(act>100)
-    minus = np.where(act<=-100)
     logexp = act
     logexp[plus] = 100
-    logexp[minus] = -100
     logexp = np.log(1 + np.exp(act))
 
     loss = np.sum(logexp) - np.dot(y,act)
@@ -165,12 +163,12 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= None):
             loss, w = learning_by_gradient_descent(minibatch_y, minibatch_tx, w, gamma)
     return w, loss
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, seed= None):
     """Implements regularised logistic regression using stochastic gradient descent"""
     batch_size = 1  ## Batch size of 1
     w = initial_w   ## Inital weight
     # Iterate over each training sample
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size):
+    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
         for iter in range(max_iters): 
             # Loop over max_iters
             # computes loss and updates w using gradient

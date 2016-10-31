@@ -11,6 +11,7 @@ Implements all the helper functions
 
 import numpy as np
 from helpers import *
+from IPython.core.debugger import Tracer
 
 def calculate_mse(e):
     """Calculate the mse for vector e."""
@@ -83,7 +84,7 @@ def sigmoid(t):
     t = np.array(t)
     plus = np.where(t>=0)
     minus = np.where(t<0)
-    sigmd = np.empty(len(t)).reshape((len(t),1))
+    sigmd = t #np.empty(len(t)).reshape((len(t),1))
     sigmd[minus] = np.exp(t[minus])/(1+np.exp(t[minus]))
     sigmd[plus] = 1/(1+np.exp(-t[plus]))
     return sigmd
@@ -91,11 +92,11 @@ def sigmoid(t):
 def calculate_loss(y, tx, w):
     """compute the cost by negative log likelihood."""
     act = np.dot(tx,w)  ## Activation
-    act = np.array(act)
+    #act = np.array(act)
     ## Handling overflow/underflow
     plus = np.where(act>100)
     minus = np.where(act<=100)
-    logexp = np.empty(len(act)).reshape((len(act),1))
+    logexp = act #np.empty(len(act)) #.reshape((len(act),1))
     logexp[plus] = act[plus]
     logexp[minus] = np.log(1+np.exp(act[minus]))
     
@@ -156,9 +157,8 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, seed= None):
     w = initial_w   ## Inital weight
     # Iterate over each training sample
     loss = 0
-    for iter in range(max_iters):
-        print(iter)
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
+    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size, seed= seed):
+        for iter in range(max_iters):
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_gradient_descent(minibatch_y, minibatch_tx, w, gamma)
@@ -169,8 +169,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     batch_size = 1  ## Batch size of 1
     w = initial_w   ## Inital weight
     # Iterate over each training sample
-    for iter in range(max_iters): 
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size):
+    for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size):
+        for iter in range(max_iters): 
             # Loop over max_iters
             # computes loss and updates w using gradient
             loss, w = learning_by_penalized_gradient(minibatch_y, minibatch_tx, w, gamma, lambda_)

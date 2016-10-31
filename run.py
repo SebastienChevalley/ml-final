@@ -1,79 +1,84 @@
-import numpy as np
+"""run.py
+Script to build model and generate submission file
+Performs following operations
+    1. Load training data
+    2. Preprocess data
+    3. Train and validate model using cross validation
+    4. Predict on test data 
+    5. Generate Kaggle submission file
+"""
 
+### Importing libraries
+import numpy as np
 from implementations import *
 from model import *
 from helpers import *
 from proj1_helpers import *
-
 from cross_validation import cross_validation
-
-DATA_TRAIN_PATH = '../../my_work/train.csv'
-DATA_TEST_PATH = '../../my_work/test.csv'
-OUTPUT_PATH = 'result.csv'
-
-print("Load dataset...")
-
-_, raw_tx_test, ids_test = load_csv_data(DATA_TEST_PATH)
-y_train, raw_tx_train, ids_train = load_csv_data(DATA_TRAIN_PATH)
+from prepare_data import prepare_data
 
 
-def prepare_data(raw_tx_train, y_train, raw_tx_test= None):
-    """
-    Load an prepare data matrix,
-    returns the tx matrix for training and testing set (if provided)
-    """
-    print("Building new dataset (1/3)...")
-    intermediate_weights, intermediate_windows, ack = trainprocess(raw_tx_train, y_train)
-    print("Building new dataset (2/3)...")
-    tx_train_edited = predictprocess(raw_tx_train, intermediate_weights, intermediate_windows, ack)
+if __name__ == "__main__":
 
-    tx_test_edited = None
-    if raw_tx_test is not None:
-        print("Building new dataset (3/3)...")
-        tx_test_edited = predictprocess(raw_tx_test, intermediate_weights, intermediate_windows, ack)
-    else:
-        print("Building new dataset (3/3) [skipped]...")
+	## ========= Load training and test data ========== ##
+	print("Loading training data...")
+	DATA_TRAIN_PATH = 'train.csv'
+	DATA_TEST_PATH = 'test.csv'
 
-    return tx_train_edited, tx_test_edited
+	_, raw_tx_test, ids_test = load_csv_data(DATA_TEST_PATH)
+	y_train, raw_tx_train, ids_train = load_csv_data(DATA_TRAIN_PATH)
+	## ================================================ ##
 
 
-def run_prediction(raw_tx_train,
-                   y_train,
-                   raw_tx_test,
-                   ids_test,
-                   method= logistic_regression,
-                   output_path= OUTPUT_PATH):
+	## ========= Preprocess data =============================== ##
+	print("Preprocessing data...")
+	tx_train_edited, tx_test_edited = prepare_data(raw_tx_train, y_train, raw_tx_test)
+	## ========================================================= ##
 
-    tx_train_edited, tx_test_edited = prepare_data(raw_tx_train, y_train, raw_tx_test)
 
-    print("Training process...")
-    weights_train, loss_train = method(
-        (y_train + 1) / 2,
-        tx_train_edited,
-        np.zeros((tx_train_edited.shape[1], 1)),
-        3,
-        .01
-    )
+	## ========= Train and validate model using cross validation ========== ##
+	model = 'logistic_regression'   ## 'least_squares','ridge_regression','logistic_regression','reg_logistic_regression'
+	K = 2                           ## K fold cross validation
+	gamma = 0.01                    ## Learning rate for gradient descent
+	lambda_ = 0.01                  ## Regularisation parameter
+	max_iters = 10                  ## Maximum number of iteration
+	initial_w = np.zeros(tx_train_edited.shape[1])# Weight initialisation
+	print("Cross validation with model: ", model)
+	# Invoke the cross validation function with the above model 
+	w, loss, avg_val_err, avg_train_err = cross_validation(y_train, tx_train_edited, K, model, lambda_, gamma,
+	                                     max_iters, initial_w, num_epochs=1, shuffle=True, seed=1)
+	## ==================================================================== ##
 
-    print("Predict process...")
-    y_pred = np.empty((len(tx_test_edited), 1))
 
-    s = tx_test_edited.dot(weights_train)
-    if method == logistic_regression:
-        print("apply sigmoid")
-        s = sigmoid(tx_test_edited.dot(weights_train))
+	print("===================")
+	print("Training Accuracy: ")
+	print((1-avg_train_err)*100)
+	print("Validation Accuracy: ")
+	print((1-avg_val_err)*100)
+	print("===================")
 
-    y_pred[np.where(s <= .5)] = -1
-    y_pred[np.where(s > .5)] = 1
-    y_pred = y_pred.reshape(len(tx_test_edited))
 
-    #y_pred = predict_labels(wtrain2, phi1)
-    create_csv_submission(ids_test, y_pred, output_path)
+    ## ============ Predict on test data ================== ##
+	print("Predicting test data...")
+	if model=='logistic_regression' or model=='reg_logistic_regression':
+		y_pred = np.empty((len(tx_test_edited), 1))
 
-def run_cross_validation(tx, y):
-    tx_edited, _ = prepare_data(tx, y)
+		s = tx_test_edited.dot(w)
+		s = sigmoid(tx_test_edited.dot(w))
 
-    # TODO cross_validation(y, tx_edited, 10, "least_squares_SGD", )
+		y_pred[np.where(s <= .5)] = -1
+		y_pred[np.where(s > .5)] = 1
+		y_pred = y_pred.reshape(len(tx_test_edited))
 
-#run_prediction(raw_tx_train, y_train, raw_tx_test, ids_test)
-run_cross_validation(raw_tx_train, y_train)
+	else:
+		y_pred = predict_labels(w, tx_test_edited)
+    ## ===================================================== ##
+
+
+    ## === Generate Kaggle submission file ========== ##
+	OUTPUT_PATH = 'result.csv'
+	create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
+    ## ============================================== ##
+
+
+

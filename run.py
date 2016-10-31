@@ -5,7 +5,7 @@ from model import *
 from helpers import *
 from proj1_helpers import *
 
-from cross_validation import cross_validation_demo
+from cross_validation import cross_validation
 
 DATA_TRAIN_PATH = '../../my_work/train.csv'
 DATA_TEST_PATH = '../../my_work/test.csv'
@@ -73,7 +73,7 @@ def run_prediction(raw_tx_train,
 def run_cross_validation(tx, y):
     tx_edited, _ = prepare_data(tx, y)
 
-    cross_validation_demo(tx_edited, y)
+    # TODO cross_validation(y, tx_edited, 10, "least_squares_SGD", )
 
 #run_prediction(raw_tx_train, y_train, raw_tx_test, ids_test)
 run_cross_validation(raw_tx_train, y_train)

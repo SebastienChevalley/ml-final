@@ -1,99 +1,103 @@
+"""
+cross_validation.py
+Performs K fold cross validation
+Inputs:
+    1. y: Labels
+    2. x: Features
+    3. K: K fold
+    4. model: 'least_squares','ridge_regression','logistic_regression','reg_logistic_regression'
+    5. max_iters: Maximum number of iterations
+    6. initial_w: Weight initialisation
+    7. num_epochs: Number of epochs (default set to 1)
+    8. shuffle: Shuffle input data for each epoch (default: True)
+    9. seed: Random seed (default: 1)
+Outputs:
+    1. w : Optimal weight
+    2. loss : Loss metric
+    3. avg_val_err: Average validation error
+    4. avg_train_err: Average training error
+"""
+from implementations import *
+from proj1_helpers import *
 import numpy as np
 
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold."""
-    num_row = y.shape[0]
-    interval = int(num_row / k_fold)
+## Cross validation
+def cross_validation(y, x, K, model, lambda_, gamma, max_iters, initial_w, num_epochs=1, shuffle=True, seed=1):
+    data_size = len(y)   ## Number of data points
+    x = np.array(x)
+    y = np.array(y)
+
+    count = 0
+    batch_size = int(data_size/K) ## Data size assumed to multiple of K
+    err_val = np.zeros(num_epochs*K)
+    err_train = np.zeros(num_epochs*K)
+
+    # Set random seed such that model comparison is uniform and consistent
     np.random.seed(seed)
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval: (k + 1) * interval]
-                 for k in range(k_fold)]
-    return np.array(k_indices)
 
-from implementations import calculate_mse, logistic_regression
-from implementations import ridge_regression
-from implementations import build_poly
-from implementations import least_squares
+    # Number of times K-fold cross validation is repeated
+    for epoch in range(num_epochs):
 
-def cross_validation(y, x, k_indices, k, degree= 1,
-                     lambda_= None, gamma= None,
-                     learn_method= lambda y, tx, lambda_= None, gamma= None: ridge_regression(y, tx, lambda_),
-                     compute_error= calculate_mse):
+        # Randomize to remove ordering in the input data
+        if shuffle == True:
+            shuffle_ind = np.random.permutation(np.arange(data_size))
+            y_shuffle = y[shuffle_ind]
+            x_shuffle = x[shuffle_ind]
+        else:
+            y_shuffle = y
+            x_shuffle = x
 
-    """return the loss of ridge regression."""
-    # ***************************************************
-    # get k'th subgroup in test, others in train: TODO
-    # ***************************************************
+        # K-fold cross validation
+        for k in range(0,K):
 
-    test_raw_x = x[k_indices[k]]
-    test_y = y[k_indices[k]]
+            # Select validation data in kth fold
+            start_val_ind = k*batch_size
+            end_val_ind   = (k+1)*batch_size
+            y_val = y_shuffle[start_val_ind: end_val_ind]
+            x_val = x_shuffle[start_val_ind: end_val_ind]
 
-    k_train_indices = np.delete(k_indices, k, axis=0).flatten()
+            # Select training data in kth fold
+            train_ind = np.setxor1d(range(0,data_size),range(start_val_ind,end_val_ind))
+            y_train = y_shuffle[train_ind]
+            x_train = x_shuffle[train_ind]
 
-    train_raw_x = x[k_train_indices]
-    train_y = y[k_train_indices]
-
-    # ***************************************************
-    # form data with polynomial degree: TODO
-    # ***************************************************
-
-    test_x = build_poly(test_raw_x, degree)
-    train_x = build_poly(train_raw_x, degree)
-
-    # ***************************************************
-    # ridge regression: TODO
-    # ***************************************************
-
-    #print([x.shape for x in [train_x, np.matrix(train_y), test_x, test_y]])
-
-    mse, w = learn_method(train_y, train_x, lambda_= lambda_, gamma= gamma)
-    loss_te = np.asscalar(compute_error(test_y, test_x, w))
-    loss_tr = np.asscalar(mse)
-
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # calculate the loss for train and test data: TODO
-    # ***************************************************
-
-    return loss_tr, loss_te
-
-from plots import cross_validation_visualization
-
-def cross_validation_demo(tx,
-                          y,
-                          learn_method= lambda y, tx, lambda_= None, gamma= None: logistic_regression(y, tx, np.zeros((tx.shape[1],)), 100, lambda_),
-                          compute_error= calculate_mse):
-    seed = 1
-    degree = 7
-    k_fold = 4
-    lambdas = np.logspace(-4, 2, 30)
-    # split data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    # define lists to store the loss of training data and test data
-    rmse_tr = []
-    rmse_te = []
-    # ***************************************************
-    # cross validation: TODO
-    # ***************************************************
-
-    gamma = 0
-    for lambda_ in lambdas:
-        train_error = 0
-        test_error = 0
-        for k in range(k_fold):
-            loss_tr, loss_te = cross_validation(y, tx, k_indices, k,
-                                                degree= degree,
-                                                lambda_= lambda_,
-                                                gamma= gamma,
-                                                learn_method= learn_method,
-                                                compute_error= compute_error)
-            train_error += loss_tr
-            test_error += loss_te
-        rmse_tr.append(np.sqrt(2 * train_error / k_fold))
-        rmse_te.append(np.sqrt(2 * test_error / k_fold))
+            # Logistic regression and reg_logistic_regression models
+            if ((model=='logistic_regression') or (model=='reg_logistic_regression')):
+                if model=='logistic_regression':    ## Train the model
+                    w, loss = logistic_regression(y_train, x_train, initial_w, max_iters, gamma)
+                elif model=='reg_logistic_regression':
+                    w, loss = reg_logistic_regression(y_train, x_train, lambda_, initial_w, max_iters, gamma)
+                # Predict on validation and training data
+                y_pred_val = np.ones(len(y_val))
+                y_pred_val[sigmoid(np.dot(x_val,w)) <= 0.5] = -1
+                y_pred_train = np.ones(len(y_train))
+                y_pred_train[sigmoid(np.dot(x_train,w)) <= 0.5] = -1
 
 
-    cross_validation_visualization(lambdas, rmse_tr, rmse_te)
+                # Least squares models
+            else:
+                if model == 'least_squares':                    ## Least squares regression using normal equation
+                    w, loss = least_squares(y_train, x_train)
+                elif model == 'least_squares_GD':               ## Least squares regression using gradient descent
+                    w, loss = least_squares_GD(y_train, x_train, initial_w, max_iters, gamma)
+                elif model == 'least_squares_SGD':              ## Least squares regression using stochastic gradient descent
+                    w, loss = least_squares_SGD(y_train, x_train, initial_w, max_iters, gamma)
+                elif model == 'ridge_regression':               ## Ridge regression
+                    w, loss = ridge_regression(y_train, x_train, lambda_)
+                else:
+                    print("Unknown model")
+                # Predict on validation and training data
+                y_pred_val = predict_labels(w, x_val)                  ## Predict on validation data
+                y_pred_train = predict_labels(w, x_train)              ## Predict on training data
 
+            err_val[count] = sum(y_pred_val!=y_val)/len(y_val)           ## Accuaracy on Validation data
+            err_train[count] = sum(y_pred_train!=y_train)/len(y_train)   ## Accuaracy on training data
+            count+=1
+
+        ## Average error over all folds of cross validation
+        avg_val_err = np.mean(err_val)
+        avg_train_err = np.mean(err_train)
+
+    ## Return optimal weight, loss, average validation error, average training error
+    return w, loss, avg_val_err, avg_train_err
 

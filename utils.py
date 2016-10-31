@@ -28,5 +28,5 @@ def mesh_indice(sample, feature_min_value, feature_max_value, mesh_resolution):
     """
     feature_range = feature_max_value - feature_min_value
 
-    return math.floor((sample - feature_min_value)/ feature_range * (mesh_resolution - 1))
+    return int(math.floor((sample - feature_min_value)/ feature_range * (mesh_resolution - 1)))
 

@@ -16,9 +16,16 @@ def calculate_mse(e):
     """Calculate the mse for vector e."""
     return 1/2*np.mean(e**2)
 
+
+assert calculate_mse(np.array([1.0, 2.0]).reshape((-1, 1))) == 1.25
+assert calculate_mse(np.array([1.0, 2.0])) == 1.25
+assert calculate_mse(4) == 8
+
 def calculate_mae(e):
     """Calculate the mae for vector e."""
     return np.mean(np.abs(e))
+
+assert calculate_mae(np.array([1.0, -2.0])) == 1.5
 
 def compute_loss(y, tx, w):
     """Calculate the loss.

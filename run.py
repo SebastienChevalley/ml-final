@@ -1,11 +1,11 @@
 """run.py
 Script to build model and generate submission file
 Performs following operations
-	1. Load training data
-	2. Preprocess data
-	3. Train and validate model using cross validation
-	4. Predict on test data
-	5. Generate Kaggle submission file
+    1. Load training data
+    2. Preprocess data
+    3. Train and validate model using cross validation
+    4. Predict on test data
+    5. Generate Kaggle submission file
 """
 
 ### Importing libraries
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     DATA_TRAIN_PATH = 'train.csv'
     print("Loading test data...")
     DATA_TEST_PATH = 'test.csv'
+    OUTPUT_PATH = 'result.csv'
 
     _, raw_tx_test, ids_test = load_csv_data(DATA_TEST_PATH)
     y_train, raw_tx_train, ids_train = load_csv_data(DATA_TRAIN_PATH)
@@ -67,6 +68,5 @@ if __name__ == "__main__":
 
     ## === Generate Kaggle submission file ========== ##
     print("Test : Submiting result.csv")
-    OUTPUT_PATH = 'result.csv'
     create_csv_submission(ids_test, y_pred_test, OUTPUT_PATH)
     ## ============================================== ##

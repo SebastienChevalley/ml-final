@@ -148,7 +148,7 @@ def trainprocess(x, y, features_tuple_list):
 
             if include_feature:
                 intermediate_phi = buildpolyphi(x.copy(), features_tuple, indices_to_select_filtered, degree)
-                loss, w = least_squares(newX[-1][indices_to_select_filtered], intermediate_phi)
+                w, loss = least_squares(newX[-1][indices_to_select_filtered], intermediate_phi)
                 #print(features_tuple, ":", loss)
 
                 intermediate_weights.append(w)

@@ -47,7 +47,7 @@ def partition_dataset(x):
 
     return partitions, all_indices, defined_values_indices
 
-def trainprocess(x, y):
+def trainprocess(x, y, features_tuple_list):
     """
     From a dataset and its label, it computes a set of new features based on a meshgrid accumulator
 
@@ -59,9 +59,6 @@ def trainprocess(x, y):
     ## ============================================= ##
     ## ========= Preprocessing parameters ========== ##
     ## ============================================= ##
-
-    # for each tuple of features, an approximation of the probability density will be computed (normalized from -1 to 1)
-    features_tuple_list = [[i] for i in range(13)]
 
     #degree for each feature to be polynomialized
     degree = 8
@@ -151,7 +148,7 @@ def trainprocess(x, y):
 
             if include_feature:
                 intermediate_phi = buildpolyphi(x.copy(), features_tuple, indices_to_select_filtered, degree)
-                loss, w = least_squares(newX[-1][indices_to_select_filtered], intermediate_phi)
+                w, loss = least_squares(newX[-1][indices_to_select_filtered], intermediate_phi)
                 #print(features_tuple, ":", loss)
 
                 intermediate_weights.append(w)
@@ -165,7 +162,7 @@ def trainprocess(x, y):
     return intermediate_weights, intermediate_windows, is_features_included
 
 
-def predictprocess(x, intermediate_weights, intermediate_windows, acks):
+def predictprocess(x, intermediate_weights, intermediate_windows, acks, features_tuple_list):
     """
     Returns a newly defined matrix with features computed from partitions
     and intermediate weight and windows which des
@@ -180,9 +177,6 @@ def predictprocess(x, intermediate_weights, intermediate_windows, acks):
     ## ============================================= ##
     ## ========= Preprocessing parameters ========== ##
     ## ============================================= ##
-
-    # for each tuple of features, an approximation of the probability density will be computed (normalized from -1 to 1)
-    features_tuple_list = [[i] for i in range(13)]
 
     #degree for each feature to be polynomialized
     degree = 8

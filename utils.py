@@ -11,11 +11,6 @@ def compute_error(y, x, w):
 def compute_mse(e):
     return 1/2*np.mean(e**2)
 
-def least_squares(y, tx):
-    """calculate the least squares solution."""
-    w = np.linalg.inv((tx.T).dot(tx)).dot(tx.T).dot(y)
-    return compute_mse(compute_error(y, tx, w)), w
-
 def ii(cond):
     '''Return the indices assuming condition'''
     return set(np.where(cond)[0])
